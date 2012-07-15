@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/file_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawableLeft="@drawable/ic_file"
+        android:ellipsize="marquee"
+        android:freezesText="false"
+        android:gravity="left|center_vertical"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</LinearLayout>
