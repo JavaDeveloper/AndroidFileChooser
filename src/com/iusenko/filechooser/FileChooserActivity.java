@@ -24,9 +24,9 @@ import android.widget.TextView;
 public class FileChooserActivity extends ListActivity {
 	private static final String TAG = FileChooserActivity.class.getSimpleName();
 
-	public static final int PICK_UP_FILE_REQUEST = -1;
-	public static final int NOTHING_SELECTD_RESULT = -2;
-	public static final int FILE_SELECTED_RESULT = -3;
+	public static final int PICK_UP_FILE_REQUEST = 1;
+	public static final int NOTHING_SELECTD_RESULT = 2;
+	public static final int FILE_SELECTED_RESULT = 3;
 
 	// public static final String ACCEPT_FILE_EXTENSIONS_KEY =
 	// "extensions-filter-key";

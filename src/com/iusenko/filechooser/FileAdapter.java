@@ -17,7 +17,9 @@ import android.widget.TextView;
  */
 public class FileAdapter extends BaseAdapter {
 
-	ArrayList<File> files = new ArrayList<File>();
+	private static final int ICON_SIZE = 64;// width and height have the same dimension
+
+	private ArrayList<File> files = new ArrayList<File>();
 	private Context context;
 	private Drawable folderDrawable;
 	private Drawable fileDrawable;
@@ -26,9 +28,9 @@ public class FileAdapter extends BaseAdapter {
 		this.context = context;
 		Resources res = context.getResources();
 		folderDrawable = res.getDrawable(R.drawable.ic_folder);
-		folderDrawable.setBounds(0, 0, 96, 96);
+		folderDrawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE);
 		fileDrawable = res.getDrawable(R.drawable.ic_file);
-		fileDrawable.setBounds(0, 0, 96, 96);
+		fileDrawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE);
 	}
 
 	public void setListItems(ArrayList<File> files) {
