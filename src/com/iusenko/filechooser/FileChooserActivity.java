@@ -3,16 +3,12 @@ package com.iusenko.filechooser;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Stack;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -28,17 +24,18 @@ public class FileChooserActivity extends ListActivity {
 	public static final int NOTHING_SELECTD_RESULT = 2;
 	public static final int FILE_SELECTED_RESULT = 3;
 
-	// public static final String ACCEPT_FILE_EXTENSIONS_KEY =
-	// "extensions-filter-key";
+	public static final String FILE_EXTENSION_FILTER_KEY = "file-filter-key";
 	public static final String SELECTED_FILE_KEY = "selected-file-key";
 	public static final String WORKING_DIRECTORY_KEY = "working-directory-key";
 	private static final String DEFAULT_WORKING_DIRECTORY = "/";
-	private Comparator<File> filenameComparator = new FileNameComparator();
+
+	private Comparator<File> filenameComparator = new FileComparator();
 
 	private File workingDirectory = new File(DEFAULT_WORKING_DIRECTORY);
 	private ArrayList<File> filelist = new ArrayList<File>();
 	private FileAdapter filelistAdapter;
 	private TextView workingDirectoryTextView;
+	private FileFilter fileExtensionFilter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +46,7 @@ public class FileChooserActivity extends ListActivity {
 		Bundle b = getIntent().getExtras();
 		if (b != null) {
 			workingDirectory = getWorkingDirectory(b);
+			fileExtensionFilter = getFileExtensionFilter(b);
 		}
 
 		filelistAdapter = new FileAdapter(this);
@@ -69,11 +67,23 @@ public class FileChooserActivity extends ListActivity {
 		return workingDirectory;
 	}
 
+	private FileFilter getFileExtensionFilter(Bundle bundle) {
+		if (bundle.containsKey(FILE_EXTENSION_FILTER_KEY)) {
+			String[] extensions = bundle.getStringArray(FILE_EXTENSION_FILTER_KEY);
+			if (extensions == null || extensions.length == 0) {
+				Log.e(TAG, "File extensions filter is blank");
+				return null;
+			}
+			return new FileExtensionFilter(extensions);
+		}
+		return null;
+	}
+
 	private void refreshFilelist(File directory) {
-		Log.d(TAG, "Current path: " + directory.getAbsolutePath());
+		Log.v(TAG, "Current path: " + directory.getAbsolutePath());
 
 		filelist.clear();
-		File[] files = directory.listFiles();
+		File[] files = fileExtensionFilter == null ? directory.listFiles() : directory.listFiles(fileExtensionFilter);
 		for (int i = 0; files != null && i < files.length; i++) {
 			filelist.add(files[i]);
 		}
@@ -99,7 +109,7 @@ public class FileChooserActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		File file = filelist.get(position);
-		Log.d(TAG, "Selected file: " + file.getAbsolutePath());
+		Log.v(TAG, "Selected file: " + file.getAbsolutePath());
 
 		if (file.isDirectory()) {
 			workingDirectory = file;
@@ -133,7 +143,7 @@ public class FileChooserActivity extends ListActivity {
 		finish();
 	}
 
-	private class FileNameComparator implements Comparator<File> {
+	private class FileComparator implements Comparator<File> {
 		public int compare(File f1, File f2) {
 			if (f1.isFile() && f2.isDirectory()) {
 				return 1;
@@ -142,5 +152,27 @@ public class FileChooserActivity extends ListActivity {
 			}
 			return f1.getName().toLowerCase().compareTo(f2.getName().toLowerCase());
 		}
+	}
+
+	private class FileExtensionFilter implements FileFilter {
+		private final String[] extensions;
+
+		public FileExtensionFilter(String[] extensions) {
+			this.extensions = extensions;
+		}
+
+		public boolean accept(File pathname) {
+			if (pathname.isDirectory()) {
+				return true;
+			}
+
+			for (String ext : extensions) {
+				if (pathname.getName().endsWith(ext)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 	}
 }
